@@ -74,12 +74,6 @@ ENV PATH $PATH:$SQOOP_HOME/bin
 RUN echo "export SQOOP_HOME=/sqoop/sqoop-1.4.7.bin__hadoop-2.6.0" >>~/.bash_profile
 RUN echo "export PATH=$PATH:$SQOOP_HOME/bin" >>~/.bash_profile
 
-#**************************************** INSTALLING NiFi and configure ******************************
-RUN mkdir nifi
-RUN wget -P /nifi http://mirrors.estointernet.in/apache/nifi/1.9.2/nifi-1.9.2-bin.tar.gz
-RUN tar -xzvf /nifi/nifi-1.9.2-bin.tar.gz -C /nifi
-RUN /nifi/nifi-1.9.2/bin/nifi.sh install
-
 #**************************************** INSTALLING Kafka and configure ******************************
 RUN mkdir kafka
 RUN wget -P /kafka http://apache.cs.utah.edu/kafka/2.2.0/kafka_2.11-2.2.0.tgz
@@ -89,17 +83,6 @@ ENV PATH $PATH:$KAFKA_HOME/bin
 RUN echo "export KAFKA_HOME=/kafka/kafka_2.11-2.2.0" >>~/.bash_profile
 RUN echo "export PATH=$PATH:$KAFKA_HOME/bin" >>~/.bash_profile
 
-#**************************************** INSTALLING elastic search ******************************
-RUN useradd -m  -s /bin/bash elastic
-RUN echo "elastic:elastic" | chpasswd
-RUN usermod -aG sudo elastic
-RUN sudo -u elastic wget -P /home/elastic/ https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.1.1-linux-x86_64.tar.gz
-RUN sudo -u elastic tar -xzvf /home/elastic/elasticsearch-7.1.1-linux-x86_64.tar.gz -C /home/elastic/
-ENV ELASTIC_SEARCH_HOME /home/elastic/elasticsearch-7.1.1
-ENV PATH $PATH:$ELASTIC_SEARCH_HOME/bin
-RUN echo "export ELASTIC_SEARCH_HOME=/home/elastic/elasticsearch-7.1.1" >>~/.bash_profile
-RUN echo "export PATH=$PATH:$ELASTIC_SEARCH_HOME/bin" >>~/.bash_profile
-
 #********************************************* Moving ~/.bash_profile to /etc/profile.d/ to get env variables to all users ****************
 RUN cp ~/.bash_profile /etc/profile.d/bash_profile.sh
 #**************************************** load script to start/stop the ecosystem ******************************
@@ -107,10 +90,8 @@ ADD ./config/start-ecosystem.sh .
 ADD ./config/stop-all.sh .
 ADD ./config/stop-hadoop.sh .
 ADD ./config/stop-hive.sh .
-ADD ./config/stop-nifi.sh .
 ADD ./config/stop-kafka.sh .
 ADD ./config/start-all.sh .
 ADD ./config/start-hadoop.sh .
 ADD ./config/start-hive.sh .
-ADD ./config/start-nifi.sh .
 ADD ./config/start-kafka.sh .
